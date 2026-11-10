@@ -1,5 +1,21 @@
 HELP.md
 target/
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties.local
+.flattened-pom.xml
+
+### Configuración y credenciales locales ###
+.env
+.env.local
+.env.*.local
+application-local.properties
+application-local.yml
+application-local.yaml
+*.credentials
+*.pem
+*.key
+*.p12
+*.pfx
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
