@@ -28,6 +28,16 @@ Proyecto Spring Boot con Maven Wrapper, JPA y MySQL. La aplicación utiliza el p
 
 La base local `araj_act3_dev` es independiente de `araj_act3` en el VPS de DigitalOcean. El MySQL del VPS solo escucha en `127.0.0.1:3306` del propio servidor y esta configuración no requiere acceder a él.
 
+## Crear las tablas locales
+
+Con la base local creada, ejecuta manualmente el esquema desde PowerShell, situado en la raíz del proyecto:
+
+```powershell
+mysql --host=127.0.0.1 --port=3306 --user=act3_dev --password araj_act3_dev --execute="source database/schema.sql"
+```
+
+El cliente solicitará la contraseña sin incluirla en el comando. Si `mysql` no está en el PATH, utiliza la ruta completa a `mysql.exe`. Comprueba que el destino sea la base local antes de ejecutar el comando. El archivo crea `categorias` y `materias`, sin datos de ejemplo; está pensado para una base sin esas tablas y fallará si ya existen. No elimina ni modifica tablas existentes.
+
 ## Ejecutar
 
 Con Java 17, MySQL local en ejecución y las variables configuradas en PowerShell:
@@ -36,7 +46,7 @@ Con Java 17, MySQL local en ejecución y las variables configuradas en PowerShel
 .\mvnw.cmd spring-boot:run
 ```
 
-La aplicación estará disponible en `http://localhost:8085`. Hibernate usa `ddl-auto=validate`: no crea ni modifica tablas; cuando se agreguen entidades, el esquema existente deberá ser compatible. Esta etapa todavía no incluye entidades ni funciones CRUD.
+La aplicación estará disponible en `http://localhost:8085`. Hibernate usa `ddl-auto=validate`: no crea ni modifica tablas y exige un esquema compatible con las entidades. Esta etapa todavía no incluye funciones CRUD.
 
 Para comprobar únicamente la compilación sin iniciar el contexto Spring ni conectar a MySQL:
 
