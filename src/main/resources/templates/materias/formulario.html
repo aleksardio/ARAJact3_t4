@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/comun :: head(${id == null ? 'Nueva materia' : 'Editar materia'})}"></head><body>
+<header th:replace="~{fragments/comun :: navegacion('materias')}"></header>
+<main class="contenedor estrecho"><a class="volver" th:href="@{/materias}">← Volver a materias</a><div class="encabezado"><div><p class="eyebrow">CONTROL ACADÉMICO / MATERIAS</p><h1 th:text="${id == null ? 'Nueva materia' : 'Editar materia'}"></h1><p class="subtitulo">Completa la información de la asignatura.</p></div></div>
+<section class="tarjeta formulario-tarjeta"><h2>Información de la materia</h2><p class="subtitulo">Todos los campos son obligatorios.</p>
+<form method="post" th:action="${id == null} ? @{/materias/nueva} : @{/materias/{id}/editar(id=${id})}" th:object="${formulario}">
+    <div class="alerta error" th:if="${#fields.hasGlobalErrors()}"><p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p></div>
+    <div class="campo"><label for="nombre">Nombre de la materia</label><input id="nombre" type="text" th:field="*{nombre}" maxlength="120" required placeholder="Ej. Programación Web"><small class="error-campo" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small></div>
+    <div class="campo"><label for="docente">Docente</label><input id="docente" type="text" th:field="*{docente}" maxlength="120" required placeholder="Nombre del docente"><small class="error-campo" th:if="${#fields.hasErrors('docente')}" th:errors="*{docente}"></small></div>
+    <div class="form-grid"><div class="campo"><label for="semestre">Semestre</label><input id="semestre" type="number" th:field="*{semestre}" min="1" max="12" required placeholder="1 - 12"><small class="error-campo" th:if="${#fields.hasErrors('semestre')}" th:errors="*{semestre}"></small></div>
+    <div class="campo"><label for="categoriaId">Categoría</label><select id="categoriaId" th:field="*{categoriaId}" required><option value="">Selecciona una categoría</option><option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option></select><small class="error-campo" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></small></div></div>
+    <p class="ayuda" th:if="${#lists.isEmpty(categorias)}">No hay categorías disponibles. <a th:href="@{/categorias/nueva}">Registra una categoría</a> antes de continuar.</p>
+    <div class="form-acciones"><a class="boton secundario" th:href="@{/materias}">Cancelar</a><button class="boton primario" type="submit">Guardar materia</button></div>
+</form></section></main><footer th:replace="~{fragments/comun :: pie}"></footer></body></html>

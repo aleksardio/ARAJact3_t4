@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/comun :: head('Materias')}"></head><body>
+<header th:replace="~{fragments/comun :: navegacion('materias')}"></header>
+<main class="contenedor">
+    <div class="encabezado"><div><p class="eyebrow">CONTROL ACADÉMICO / MATERIAS</p><h1>Materias</h1><p class="subtitulo">Consulta y administra tus asignaturas.</p></div><a class="boton primario" th:href="@{/materias/nueva}">+ Nueva materia</a></div>
+    <div th:replace="~{fragments/comun :: mensajes}"></div>
+    <section class="tarjeta filtros"><form method="get" th:action="@{/materias}" class="filtros-form">
+        <div class="campo"><label for="categoriaId">Categoría</label><select id="categoriaId" name="categoriaId"><option value="">Todas las categorías</option><option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}" th:selected="${categoria.id == categoriaId}"></option></select></div>
+        <div class="campo"><label for="semestre">Semestre</label><select id="semestre" name="semestre"><option value="">Todos los semestres</option><option th:each="numero : ${#numbers.sequence(1,12)}" th:value="${numero}" th:text="${numero}" th:selected="${numero == semestre}"></option></select></div>
+        <button class="boton primario" type="submit">Filtrar</button><a class="boton secundario" th:href="@{/materias}">Limpiar</a>
+    </form></section>
+    <section class="tarjeta tabla-tarjeta"><div class="tabla-cabecera"><div><h2>Listado de materias</h2><p th:text="${#lists.size(materias)} + ' resultado(s)'">0 resultados</p></div></div>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(materias)}"><table><thead><tr><th>ID</th><th>Materia</th><th>Docente</th><th>Semestre</th><th>Categoría</th><th>Acciones</th></tr></thead><tbody>
+        <tr th:each="materia : ${materias}"><td class="atenuado" th:text="${materia.id}"></td><td class="nombre-tabla" th:text="${materia.nombre}"></td><td th:text="${materia.docente}"></td><td><span class="etiqueta" th:text="${materia.semestre} + 'º' "></span></td><td th:text="${materia.categoriaNombre}"></td><td><div class="acciones"><a class="accion" th:href="@{/materias/{id}(id=${materia.id})}">Consultar</a><a class="accion" th:href="@{/materias/{id}/editar(id=${materia.id})}">Editar</a><form method="post" th:action="@{/materias/{id}/eliminar(id=${materia.id})}" onsubmit="return confirm('¿Deseas eliminar esta materia?');"><button class="accion peligro" type="submit">Eliminar</button></form></div></td></tr>
+        </tbody></table></div><div class="vacio" th:if="${#lists.isEmpty(materias)}">No se encontraron materias. Prueba otros filtros o registra una nueva.</div>
+    </section>
+</main><footer th:replace="~{fragments/comun :: pie}"></footer></body></html>

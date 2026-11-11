@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/comun :: head('Inicio')}"></head>
+<body>
+<header th:replace="~{fragments/comun :: navegacion('inicio')}"></header>
+<main class="contenedor">
+    <section class="hero">
+        <div><p class="eyebrow claro">TU ESPACIO ACADÉMICO</p><h1>Todo tu avance,<br>en un solo lugar.</h1><p>Bienvenido a Control Académico. Organiza tus materias y categorías de forma sencilla.</p><a class="boton boton-claro" th:href="@{/materias}">Explorar materias <span aria-hidden="true">→</span></a></div>
+        <div class="hero-decor" aria-hidden="true"><span>CA</span><small>CONTROL<br>ACADÉMICO</small></div>
+    </section>
+    <div class="seccion-titulo"><div><p class="eyebrow">VISTA GENERAL</p><h2>Tu resumen académico</h2><p class="subtitulo">Una mirada rápida a tu información actual.</p></div></div>
+    <section class="estadisticas" aria-label="Resumen académico">
+        <article class="tarjeta estadistica"><span class="icono azul">M</span><div><p>Materias registradas</p><strong th:text="${totalMaterias}">0</strong><small>En tu plan académico</small></div></article>
+        <article class="tarjeta estadistica"><span class="icono violeta">C</span><div><p>Categorías</p><strong th:text="${totalCategorias}">0</strong><small>Áreas de conocimiento</small></div></article>
+        <article class="tarjeta estadistica"><span class="icono verde">8</span><div><p>Octavo semestre</p><strong th:text="${materiasSemestre8}">0</strong><small>Materias registradas</small></div></article>
+    </section>
+    <div class="seccion-titulo"><div><p class="eyebrow">ACCESOS RÁPIDOS</p><h2>¿Qué deseas hacer?</h2></div></div>
+    <section class="accesos">
+        <a class="tarjeta acceso" th:href="@{/materias}"><span class="icono azul">M</span><div><h3>Gestionar materias</h3><p>Consulta, registra y actualiza tus asignaturas.</p></div><span class="flecha">→</span></a>
+        <a class="tarjeta acceso" th:href="@{/categorias}"><span class="icono violeta">C</span><div><h3>Administrar categorías</h3><p>Organiza las materias por área de conocimiento.</p></div><span class="flecha">→</span></a>
+    </section>
+</main><footer th:replace="~{fragments/comun :: pie}"></footer>
+</body></html>

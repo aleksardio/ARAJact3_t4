@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Control Académico'">Control Académico</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<header th:fragment="navegacion(activo)" class="topbar">
+    <div class="nav-inner">
+        <a class="marca" th:href="@{/}"><span class="marca-icono">CA</span><span>Control <strong>Académico</strong></span></a>
+        <nav aria-label="Navegación principal">
+            <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'activo'">Inicio</a>
+            <a th:href="@{/materias}" th:classappend="${activo == 'materias'} ? 'activo'">Materias</a>
+            <a th:href="@{/categorias}" th:classappend="${activo == 'categorias'} ? 'activo'">Categorías</a>
+        </nav>
+    </div>
+</header>
+<div th:fragment="mensajes" aria-live="polite">
+    <div class="alerta exito" th:if="${exito}" th:text="${exito}"></div>
+    <div class="alerta error" th:if="${error}" th:text="${error}"></div>
+</div>
+<footer th:fragment="pie" class="pie">Control Académico <span>·</span> Tu información, organizada.</footer>
+</body>
+</html>

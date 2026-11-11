@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/comun :: head(${id == null ? 'Nueva categoría' : 'Editar categoría'})}"></head><body>
+<header th:replace="~{fragments/comun :: navegacion('categorias')}"></header><main class="contenedor estrecho">
+<a class="volver" th:href="@{/categorias}">← Volver a categorías</a><div class="encabezado"><div><p class="eyebrow">CONTROL ACADÉMICO / CATEGORÍAS</p><h1 th:text="${id == null ? 'Nueva categoría' : 'Editar categoría'}"></h1><p class="subtitulo">Define un área para organizar tus materias.</p></div></div>
+<section class="tarjeta formulario-tarjeta"><h2>Información de la categoría</h2><p class="subtitulo">El nombre es obligatorio.</p>
+<form method="post" th:action="${id == null} ? @{/categorias/nueva} : @{/categorias/{id}/editar(id=${id})}" th:object="${formulario}">
+<div class="alerta error" th:if="${#fields.hasGlobalErrors()}"><p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p></div>
+<div class="campo"><label for="nombre">Nombre de la categoría</label><input id="nombre" type="text" th:field="*{nombre}" maxlength="100" required placeholder="Ej. Programación"><small class="error-campo" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small></div>
+<div class="campo"><label for="descripcion">Descripción <span class="opcional">(opcional)</span></label><textarea id="descripcion" th:field="*{descripcion}" maxlength="255" rows="4" placeholder="Describe esta área de conocimiento"></textarea><small class="error-campo" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></small></div>
+<div class="form-acciones"><a class="boton secundario" th:href="@{/categorias}">Cancelar</a><button class="boton primario" type="submit">Guardar categoría</button></div>
+</form></section></main><footer th:replace="~{fragments/comun :: pie}"></footer></body></html>

@@ -1,0 +1,5 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/comun :: head('Detalle de materia')}"></head><body>
+<header th:replace="~{fragments/comun :: navegacion('materias')}"></header><main class="contenedor estrecho">
+<a class="volver" th:href="@{/materias}">← Volver a materias</a><div class="encabezado"><div><p class="eyebrow">CONTROL ACADÉMICO / MATERIAS</p><h1>Detalle de materia</h1><p class="subtitulo">Información registrada de la asignatura.</p></div><a class="boton primario" th:href="@{/materias/{id}/editar(id=${materia.id})}">Editar materia</a></div>
+<section class="tarjeta detalle"><h2 th:text="${materia.nombre}"></h2><dl><div><dt>Identificador</dt><dd th:text="${materia.id}"></dd></div><div><dt>Nombre</dt><dd th:text="${materia.nombre}"></dd></div><div><dt>Docente</dt><dd th:text="${materia.docente}"></dd></div><div><dt>Semestre</dt><dd th:text="${materia.semestre}"></dd></div><div><dt>Categoría</dt><dd th:text="${materia.categoriaNombre}"></dd></div></dl></section>
+</main><footer th:replace="~{fragments/comun :: pie}"></footer></body></html>

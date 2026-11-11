@@ -1,0 +1,2 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/comun :: head('No encontrado')}"></head><body>
+<header th:replace="~{fragments/comun :: navegacion('')}"></header><main class="contenedor estrecho"><section class="tarjeta vacio espacio"><p class="eyebrow">ERROR 404</p><h1>Registro no encontrado</h1><p th:text="${mensaje}"></p><a class="boton primario" th:href="@{/}">Volver al inicio</a></section></main><footer th:replace="~{fragments/comun :: pie}"></footer></body></html>
