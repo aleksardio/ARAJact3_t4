@@ -168,6 +168,23 @@ Respuesta ilustrativa con estado 201:
 
 Los ID son ejemplos y pueden variar. Para actualizar mediante PUT se utiliza el mismo formato de entrada; la descripción de categoría es opcional. Las respuestas de error usan, por ejemplo, `{"estado":409,"mensaje":"Ya existe una categoría con ese nombre"}`: **400** indica datos inválidos, **404** un registro inexistente y **409** un conflicto de negocio o integridad. Las eliminaciones exitosas devuelven 204 sin cuerpo.
 
+## Pruebas de API con Postman
+
+Archivos importables:
+
+- [Colección Actividad3_ControlAcademico.postman_collection.json](postman/Actividad3_ControlAcademico.postman_collection.json)
+- [Entorno Actividad3_DigitalOcean.postman_environment.json](postman/Actividad3_DigitalOcean.postman_environment.json)
+
+1. En Postman, selecciona **Import** e importa el archivo de la colección. Repite la operación con el archivo del entorno.
+2. Selecciona el entorno **Actividad 3 - DigitalOcean** en el selector de entornos. Su variable `base_url` apunta a `http://204.48.17.197:8085`. Para probar localmente, cambia su valor actual a `http://localhost:8087` y ejecuta la aplicación local según las instrucciones de instalación.
+3. Las carpetas **Categorías**, **Materias** y **Pruebas de validación** contienen las peticiones. Se pueden enviar individualmente con **Send**: los GET de listado son independientes; las consultas por ID, PUT y DELETE requieren primero crear los registros de prueba mediante la colección y conservar las variables del mismo entorno y destino. Los POST y PUT usan cuerpos JSON de ejemplo; revisa la pestaña **Tests** para ver las aserciones.
+4. Para el flujo completo, usa **Run collection** desde el inicio, selecciona el entorno y ejecuta una sola iteración a la vez. No ejecutes carpetas aisladas con el runner: los scripts saltan entre carpetas para crear la categoría y la materia, comprobar las validaciones y después eliminar la materia y la categoría de prueba.
+5. Se esperan 200 en consultas y actualizaciones, 201 en creaciones, 400 en solicitudes inválidas, 409 al intentar eliminar una categoría con materias, 204 en eliminaciones y 404 al consultar la materia ya eliminada. El runner muestra el resultado de las aserciones; estos valores son expectativas, no resultados de una ejecución realizada aquí.
+
+**Precauciones:** el entorno exportado apunta al servidor público, por lo que ejecutar la colección completa realiza escrituras y eliminaciones reales. Usa preferentemente una base local de prueba o solicita autorización para cualquier otro destino. La colección crea una categoría con nombre único y una materia temporal; guarda sus ID de respuesta en `categoria_id` y `materia_id`, comprueba que coincidan con las marcas de la colección y con el destino, y no utiliza los ID de los datos iniciales. No edites esas variables ni desactives los scripts. Los mecanismos de comprobación no sustituyen una revisión de los recursos antes de borrar.
+
+Si se detiene el runner, falla una petición, se pierde una respuesta o se interrumpe la conexión, pueden quedar registros de prueba y la limpieza automática puede no ejecutarse. Antes de iniciar otra ejecución, identifica por nombre y respuesta los registros temporales que realmente se crearon y elimínalos solo después de verificar que son tuyos; primero la materia y después la categoría. Si la respuesta de creación no confirma un ID, consulta el listado y verifica el recurso antes de actuar. No elimines las 15 materias ni las 5 categorías iniciales. Las variables y marcas se reinician al crear otra categoría de prueba, de modo que no deben usarse para identificar registros de una ejecución anterior.
+
 ## Instalación y ejecución local
 
 ### Requisitos

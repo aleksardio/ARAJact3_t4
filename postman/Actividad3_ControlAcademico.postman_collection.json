@@ -1,0 +1,134 @@
+{
+  "info": {
+    "_postman_id": "ee98a4b3-8bf4-4a80-850b-7d4e6072306f",
+    "name": "Actividad 3 - Control Académico",
+    "description": "CRUD y validaciones. Ejecuta la colección completa con un entorno seleccionado y una base de prueba autorizada. Crea registros temporales, los modifica y elimina; no ejecutes contra producción sin autorización. No edites los IDs ni cambies base_url durante una ejecución. Si se interrumpe, revisa y limpia manualmente solo los registros de prueba. Los saltos del runner mantienen el orden de dependencias.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [{
+    "listen": "prerequest",
+    "script": { "type": "text/javascript", "exec": [
+      "const nombre = pm.info.requestName;",
+      "const base = pm.environment.get('base_url');",
+      "const saltar = (mensaje) => { console.error(mensaje); pm.execution.setNextRequest(null); pm.execution.skipRequest(); };",
+      "if (!base || pm.variables.get('base_url') !== base) { saltar('Selecciona un entorno y comprueba base_url, sin variables que lo oculten.'); }",
+      "if (nombre === 'Crear categoría de prueba') {",
+      "  pm.environment.unset('categoria_id'); pm.environment.unset('materia_id');",
+      "  pm.collectionVariables.unset('categoria_creada'); pm.collectionVariables.unset('materia_creada'); pm.collectionVariables.unset('materia_eliminada');",
+      "  pm.collectionVariables.set('base_prueba', base);",
+      "  pm.environment.set('nombre_categoria_prueba', 'Categoría de prueba Postman ' + pm.variables.replaceIn('{{$guid}}'));",
+      "}",
+      "const categoriaNecesaria = ['Consultar categoría por ID', 'Actualizar categoría de prueba', 'Eliminar categoría de prueba', 'Crear materia de prueba', 'Filtrar materias por categoría', 'Crear materia con campos faltantes', 'Crear materia con semestre inválido', 'Intentar eliminar categoría con materias'].includes(nombre);",
+      "const materiaNecesaria = ['Consultar materia por ID', 'Actualizar materia de prueba', 'Eliminar materia de prueba', 'Intentar eliminar categoría con materias'].includes(nombre);",
+      "const valida = (clave, marca) => { const id = pm.environment.get(clave); return id && String(id) === String(pm.collectionVariables.get(marca)) && String(id) === String(pm.variables.get(clave)); };",
+      "if ((categoriaNecesaria || materiaNecesaria || nombre === 'Consultar materia eliminada') && pm.collectionVariables.get('base_prueba') !== base) { saltar('La URL cambió o no existe una ejecución de prueba válida.'); }",
+      "if (categoriaNecesaria && !valida('categoria_id', 'categoria_creada')) { saltar('Falta el ID de la categoría creada por esta colección.'); }",
+      "if (materiaNecesaria && !valida('materia_id', 'materia_creada')) { saltar('Falta el ID de la materia creada por esta colección.'); }",
+      "if (nombre === 'Consultar materia eliminada' && !valida('materia_id', 'materia_eliminada')) { saltar('Primero elimina la materia de prueba.'); }",
+      "if (nombre === 'Crear materia de prueba') { pm.environment.unset('materia_id'); pm.collectionVariables.unset('materia_creada'); pm.collectionVariables.unset('materia_eliminada'); }",
+      "if ((nombre === 'Crear categoría de prueba' || nombre === 'Actualizar categoría de prueba') && pm.variables.get('nombre_categoria_prueba') !== pm.environment.get('nombre_categoria_prueba')) { saltar('La variable de nombre está oculta por otro ámbito.'); }"
+    ] }
+  }],
+  "item": [
+    {
+      "name": "Categorías",
+      "item": [
+        {
+          "name": "Listar categorías",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/categorias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y lista JSON', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] } }]
+        },
+        {
+          "name": "Crear categoría de prueba",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"{{nombre_categoria_prueba}}\",\n  \"descripcion\": \"Registro temporal creado por Postman\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/categorias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "let datos; try { datos = pm.response.json(); } catch (e) { datos = null; }",
+            "const valido = pm.response.code === 201 && datos && Number.isSafeInteger(datos.id) && datos.id > 0 && datos.nombre === pm.environment.get('nombre_categoria_prueba');",
+            "pm.test('201 y categoría temporal con ID', () => pm.expect(valido).to.equal(true));",
+            "if (valido) { pm.environment.set('categoria_id', String(datos.id)); pm.collectionVariables.set('categoria_creada', String(datos.id)); } else { console.error('No se confirmó la creación; revisa la respuesta antes de limpiar.'); pm.execution.setNextRequest(null); }"
+          ] } }]
+        },
+        {
+          "name": "Consultar categoría por ID",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/categorias/{{categoria_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y categoría creada', () => { pm.response.to.have.status(200); const d = pm.response.json(); pm.expect(String(d.id)).to.equal(pm.environment.get('categoria_id')); pm.expect(d.nombre).to.equal(pm.environment.get('nombre_categoria_prueba')); });"] } }]
+        },
+        {
+          "name": "Actualizar categoría de prueba",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"{{nombre_categoria_prueba}}\",\n  \"descripcion\": \"Descripción actualizada por Postman\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/categorias/{{categoria_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y descripción actualizada', () => { pm.response.to.have.status(200); const d = pm.response.json(); pm.expect(String(d.id)).to.equal(pm.environment.get('categoria_id')); pm.expect(d.descripcion).to.equal('Descripción actualizada por Postman'); });", "pm.execution.setNextRequest('Listar materias');"] } }]
+        },
+        {
+          "name": "Eliminar categoría de prueba",
+          "request": { "method": "DELETE", "header": [], "url": "{{base_url}}/api/categorias/{{categoria_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('204 al eliminar categoría', () => pm.response.to.have.status(204));", "if (pm.response.code === 204) { pm.collectionVariables.unset('categoria_creada'); pm.environment.unset('categoria_id'); }", "pm.execution.setNextRequest(null);"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Materias",
+      "item": [
+        {
+          "name": "Listar materias",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/materias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y lista JSON', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] } }]
+        },
+        {
+          "name": "Crear materia de prueba",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Materia de prueba Postman\",\n  \"docente\": \"Docente de prueba\",\n  \"semestre\": 8,\n  \"categoriaId\": {{categoria_id}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/materias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "let datos; try { datos = pm.response.json(); } catch (e) { datos = null; }",
+            "const valido = pm.response.code === 201 && datos && Number.isSafeInteger(datos.id) && datos.id > 0 && datos.nombre === 'Materia de prueba Postman' && String(datos.categoriaId) === pm.environment.get('categoria_id');",
+            "pm.test('201 y materia temporal con categoría', () => { pm.expect(valido).to.equal(true); pm.expect(datos.categoriaNombre).to.equal(pm.environment.get('nombre_categoria_prueba')); });",
+            "if (valido) { pm.environment.set('materia_id', String(datos.id)); pm.collectionVariables.set('materia_creada', String(datos.id)); } else { console.error('No se confirmó la creación; revisa la respuesta antes de limpiar.'); pm.execution.setNextRequest(null); }"
+          ] } }]
+        },
+        {
+          "name": "Consultar materia por ID",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/materias/{{materia_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y materia creada', () => { pm.response.to.have.status(200); const d = pm.response.json(); pm.expect(String(d.id)).to.equal(pm.environment.get('materia_id')); pm.expect(d.categoriaNombre).to.equal(pm.environment.get('nombre_categoria_prueba')); });"] } }]
+        },
+        {
+          "name": "Actualizar materia de prueba",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Materia de prueba Postman actualizada\",\n  \"docente\": \"Docente de prueba actualizado\",\n  \"semestre\": 7,\n  \"categoriaId\": {{categoria_id}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/materias/{{materia_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y datos actualizados', () => { pm.response.to.have.status(200); const d = pm.response.json(); pm.expect(String(d.id)).to.equal(pm.environment.get('materia_id')); pm.expect(d.nombre).to.equal('Materia de prueba Postman actualizada'); pm.expect(d.docente).to.equal('Docente de prueba actualizado'); pm.expect(d.semestre).to.equal(7); pm.expect(String(d.categoriaId)).to.equal(pm.environment.get('categoria_id')); });"] } }]
+        },
+        {
+          "name": "Filtrar materias por categoría",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/materias?categoriaId={{categoria_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 y filtro incluye la materia de prueba', () => { pm.response.to.have.status(200); const lista = pm.response.json(); pm.expect(lista).to.be.an('array'); pm.expect(lista.some(m => String(m.id) === pm.environment.get('materia_id'))).to.equal(true); pm.expect(lista.every(m => String(m.categoriaId) === pm.environment.get('categoria_id'))).to.equal(true); });", "pm.execution.setNextRequest('Crear materia con campos faltantes');"] } }]
+        },
+        {
+          "name": "Eliminar materia de prueba",
+          "request": { "method": "DELETE", "header": [], "url": "{{base_url}}/api/materias/{{materia_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('204 al eliminar materia', () => pm.response.to.have.status(204));", "if (pm.response.code === 204) { pm.collectionVariables.set('materia_eliminada', pm.environment.get('materia_id')); pm.collectionVariables.unset('materia_creada'); pm.execution.setNextRequest('Consultar materia eliminada'); } else { pm.execution.setNextRequest(null); }"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Pruebas de validación",
+      "item": [
+        {
+          "name": "Crear materia con campos faltantes",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Materia de prueba Postman\",\n  \"categoriaId\": {{categoria_id}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/materias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 por campos obligatorios', () => { pm.response.to.have.status(400); pm.expect(pm.response.json().estado).to.equal(400); });"] } }]
+        },
+        {
+          "name": "Crear materia con semestre inválido",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Materia de prueba Postman\",\n  \"docente\": \"Docente de prueba\",\n  \"semestre\": 13,\n  \"categoriaId\": {{categoria_id}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/api/materias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 por semestre fuera de rango', () => { pm.response.to.have.status(400); pm.expect(pm.response.json().estado).to.equal(400); });"] } }]
+        },
+        {
+          "name": "Intentar eliminar categoría con materias",
+          "request": { "method": "DELETE", "header": [], "url": "{{base_url}}/api/categorias/{{categoria_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('409 por materias asociadas', () => { pm.response.to.have.status(409); pm.expect(pm.response.json().estado).to.equal(409); });", "if (pm.response.code === 409) { pm.execution.setNextRequest('Eliminar materia de prueba'); } else { pm.execution.setNextRequest(null); }"] } }]
+        },
+        {
+          "name": "Consultar materia eliminada",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/api/materias/{{materia_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 para materia eliminada', () => { pm.response.to.have.status(404); pm.expect(pm.response.json().estado).to.equal(404); });", "pm.execution.setNextRequest('Eliminar categoría de prueba');"] } }]
+        }
+      ]
+    }
+  ]
+}
