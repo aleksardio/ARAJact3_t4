@@ -1,6 +1,4 @@
--- Ejecutar manualmente sobre la base local seleccionada, después de schema.sql.
--- Una materia existente con el mismo nombre se conserva sin cambios.
--- Ejecutar una sola carga a la vez: materias no tiene una restricción UNIQUE.
+
 SET NAMES utf8mb4;
 
 START TRANSACTION;
