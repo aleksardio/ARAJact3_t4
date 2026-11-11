@@ -37,7 +37,7 @@ public class CategoriaService {
         String nombreValidado = validarNombre(nombre);
         validarDescripcion(descripcion);
         if (categorias.existsByNombre(nombreValidado)) {
-            throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
+            throw new ConflictoException("Ya existe una categoría con ese nombre");
         }
         Categoria categoria = new Categoria();
         categoria.setNombre(nombreValidado);
@@ -52,7 +52,7 @@ public class CategoriaService {
         validarDescripcion(descripcion);
         categorias.findByNombre(nombreValidado).ifPresent(otra -> {
             if (!otra.getId().equals(id)) {
-                throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
+                throw new ConflictoException("Ya existe una categoría con ese nombre");
             }
         });
         categoria.setNombre(nombreValidado);
@@ -64,14 +64,14 @@ public class CategoriaService {
     public void eliminar(Long id) {
         Categoria categoria = obtener(id);
         if (materias.existsByCategoriaId(id)) {
-            throw new IllegalStateException("No se puede eliminar una categoría con materias asociadas");
+            throw new ConflictoException("No se puede eliminar una categoría con materias asociadas");
         }
         categorias.delete(categoria);
     }
 
     private Categoria obtener(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("El identificador de categoría es obligatorio");
+            throw new DatosInvalidosException("El identificador de categoría es obligatorio");
         }
         return categorias.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No existe la categoría con id " + id));
@@ -79,18 +79,18 @@ public class CategoriaService {
 
     private static String validarNombre(String nombre) {
         if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre de la categoría es obligatorio");
+            throw new DatosInvalidosException("El nombre de la categoría es obligatorio");
         }
         String resultado = nombre.strip();
         if (resultado.length() > 100) {
-            throw new IllegalArgumentException("El nombre de la categoría no puede superar 100 caracteres");
+            throw new DatosInvalidosException("El nombre de la categoría no puede superar 100 caracteres");
         }
         return resultado;
     }
 
     private static void validarDescripcion(String descripcion) {
         if (descripcion != null && descripcion.length() > 255) {
-            throw new IllegalArgumentException("La descripción no puede superar 255 caracteres");
+            throw new DatosInvalidosException("La descripción no puede superar 255 caracteres");
         }
     }
 
